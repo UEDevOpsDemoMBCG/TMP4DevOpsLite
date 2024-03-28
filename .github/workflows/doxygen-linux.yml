@@ -1,0 +1,66 @@
+## Uncomment the branches to run this Workflow on them
+name: Game Documentation (Linux workflow)
+on:
+  push:
+    branches: 
+    #- main
+    - not-existing-branch
+  pull_request:
+    branches: 
+    #- main
+    - not-existing-branch
+
+## This is for deploy-pages
+permissions:
+  pages: write
+  deployments: write
+  id-token: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    ## This is for deploy-pages
+    environment:
+     name: github-pages
+     url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check Installed Software
+        run: whereis git & whereis python & whereis pip & python --version & pip --version
+        
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: 
+          submodules: 'recursive'
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+
+      - name: Verify Doxygen installation
+        run: doxygen --version
+        
+      ## Path tags in Doxyfile must have forward slashes on Linux
+      - name: Replace back slashes
+        run: |
+          python replace-backslashes.py ${{ env.file_to_process }}
+        env:
+          file_to_process: Doxyfile
+        working-directory: devops_data
+
+      - name: Run Doxygen
+        run: doxygen devops_data/Doxyfile
+        
+      - name: Upload Docs to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Documentation/html
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Deploy To GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
