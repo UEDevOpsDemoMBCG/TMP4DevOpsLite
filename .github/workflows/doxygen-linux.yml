@@ -1,4 +1,4 @@
-## Uncomment the branches to run this Workflow on them
+## Uncomment/add the branches to run this Workflow on them
 name: Game Documentation (Linux workflow)
 on:
   push:
@@ -27,8 +27,29 @@ jobs:
 
     steps:
       - name: Check Installed Software
-        run: whereis git & whereis python & whereis pip & python --version & pip --version
-        
+        run: |
+          python --version
+          pip --version
+          git --version
+
+      - name: Determine Python path
+        id: find_python_path
+        run: |
+          # Find the path to Python executable
+          PYTHON_EXEC=$(command -v python)
+          echo "PYTHON_EXEC=$PYTHON_EXEC" >> $GITHUB_ENV
+
+      ## py command is used in Doxyfile tags
+      - name: Create symbolic link for py command
+        run: |
+          # Create symbolic link named "py" pointing to Python executable
+          sudo ln -s $PYTHON_EXEC /usr/bin/py
+
+      - name: Verify py command
+        run: |
+          # Verify py command by checking its version
+          py --version
+          
       - name: Checkout
         uses: actions/checkout@v4
         with: 
@@ -41,14 +62,12 @@ jobs:
 
       - name: Verify Doxygen installation
         run: doxygen --version
-        
+
       ## Path tags in Doxyfile must have forward slashes on Linux
       - name: Replace back slashes
         run: |
-          python replace-backslashes.py ${{ env.file_to_process }}
-        env:
-          file_to_process: Doxyfile
-        working-directory: devops_data
+          py devops_ue/docs/replace-path-backslashes.py devops_data/Doxyfile
+        working-directory: ${{ github.workspace }}
 
       - name: Run Doxygen
         run: doxygen devops_data/Doxyfile

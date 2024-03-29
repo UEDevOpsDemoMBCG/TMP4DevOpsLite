@@ -3,12 +3,10 @@ name: Game Documentation
 on:
   push:
     branches: 
-    #- master
-    - not-existing-branch
+    - master
   pull_request:
     branches: 
-    #- master
-    - not-existing-branch
+    - master
 
 permissions:
   pages: write
