@@ -4,6 +4,7 @@ on:
   push:
     branches: 
     #- main
+    - test/doxyg-lnux
     - not-existing-branch
   pull_request:
     branches: 
