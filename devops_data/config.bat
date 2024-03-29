@@ -17,7 +17,7 @@ set RunUATPath=%EnginePath%\Engine\Build\BatchFiles\RunUAT.bat
 rem Project params
 set ProjectRoot=%~dp0..
 :: Pure name of your project. Example: name of you project file is TPS.uproject, then ProjectPureName=TPS
-set ProjectPureName=TMP4DevOpsLite
+set ProjectPureName=Lite01
 set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
 set SourceCodePath=%ProjectRoot%\Source
